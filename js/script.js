@@ -1,61 +1,83 @@
-var start = new Date().getTime();
-var bestTime = 999;
+var reactionTester = {
+  /* Game variables */
+  start: null,
+  bestTime: false,
 
+  /* Cached elements */
+  circleElement: document.getElementById("shape"),
+  timeTakenElement: document.getElementById("timeTaken"),
+  bestTimeElement: document.getElementById("bestTime"),
 
-function getRandomColor() {
-    var letters = '0123456789ABCDE';
-    var color = '#';
-    for (var i = 0; i < 6; i++ ) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
+  /* Functions */
+
+  getRandomColor: function() {
+      var letters = '0123456789ABCDE';
+      var color = '#';
+      for (var i = 0; i < 6; i++ ) {
+        //creates a random selection of letters and numbers to create a hex color
+          color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+  },
+
+  makeCircleAppear: function(){
+    //choose a random location for the circle within certain parameters
+  	var top = Math.random() * 5;
+  	var left = Math.random() * 800;
+  	var width = (Math.random() * 250) + 50;
+
+  	reactionTester.circleElement.style.backgroundColor = reactionTester.getRandomColor();
+  	reactionTester.circleElement.style.top = top + "px";
+  	reactionTester.circleElement.style.left = left + "px";
+  	reactionTester.circleElement.style.width = width + "px";
+  	reactionTester.circleElement.style.height = width + "px";
+  	reactionTester.circleElement.style.display = "block";
+  
+  	reactionTester.start = new Date().getTime();
+  },
+
+  appearAfterDelay: function (){
+  	setTimeout(reactionTester.makeCircleAppear, Math.random() * 2000);
+  }
+
 }
 
-function makeShapeAppear(){
-	var top = Math.random() * 5;
-	var left = Math.random() * 800;
-	var width = (Math.random() * 250) + 50;
-	document.getElementById("shape").style.backgroundColor = getRandomColor();
-	document.getElementById("shape").style.top = top + "px";
-	document.getElementById("shape").style.left = left + "px";
-	document.getElementById("shape").style.width = width + "px";
-	document.getElementById("shape").style.height = width + "px";
-	document.getElementById("shape").style.display = "block";
-	start = new Date().getTime();
-}
+reactionTester.appearAfterDelay();
 
-function appearAfterDelay(){
-	setTimeout(makeShapeAppear, Math.random() * 2000);
-}
+reactionTester.circleElement.onclick = function() {
+  reactionTester.circleElement.style.display = "none";
 
-appearAfterDelay();
-
-
-
-document.getElementById("shape").onclick = function() {
-	document.getElementById("shape").style.display = "none";
-	var end = new Date().getTime();
-	var timeTaken = (end - start) / 1000;
+  var end = new Date().getTime();
+  var timeTaken = (end - reactionTester.start) / 1000;
+  //display different colors where it says "your time":
   if (timeTaken > 1.5){
-    document.getElementById("timeTaken").style.color = "red";
+    reactionTester.timeTakenElement.style.color = "red";
   } else if (timeTaken >= 1){
-    document.getElementById("timeTaken").style.color = "orange";
+    reactionTester.timeTakenElement.style.color = "orange";
   } else {
-    document.getElementById("timeTaken").style.color = "green";
+    reactionTester.timeTakenElement.style.color = "green";
   }
-  document.getElementById("timeTaken").innerHTML = timeTaken + "s";
-  
-  if (bestTime === 999){
-    document.getElementById("bestTime").style.display = "none";
+
+  reactionTester.timeTakenElement.innerHTML = timeTaken + "s";
+
+    //if no best time (ie start of the game), do not display the "best time" element:
+  if (!reactionTester.bestTime){
+    reactionTester.bestTimeElement.style.display = "none";
+    reactionTester.bestTime = timeTaken;
   } else {
-    document.getElementById("bestTime").style.display = "unset";
+    //display the best time element when a time exists:
+    reactionTester.bestTimeElement.style.display = "unset";
+    //update best time when it's less than the saved best time.
+    if (timeTaken < reactionTester.bestTime) {
+      reactionTester.bestTime = timeTaken;
+    }
   }
-  //update best time if the current time is smaller.
-  if (timeTaken < bestTime) {
-    bestTime = timeTaken;
-  }
-  document.getElementById("bestTime").innerHTML = bestTime + "s";
   
-  appearAfterDelay();
+  reactionTester.bestTimeElement.innerHTML = reactionTester.bestTime + "s";
+
+  reactionTester.appearAfterDelay();
 }
 
+var rt = new reactionTester();
+
+rt.makeCircleAppear();
